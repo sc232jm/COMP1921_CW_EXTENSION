@@ -169,10 +169,13 @@ void pathGeneration() {
 };
 
 int main(int argc, char *argv[]) {
-    srand(time(NULL));
-
     height = atoi(argv[1]);
     width = atoi(argv[2]);
+    if(argc == 4) {
+        srand(atoi(argv[3]));
+    } else {
+        srand(time(NULL));
+    }
 
     graph = malloc(height*width*sizeof(node));
 
