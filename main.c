@@ -122,26 +122,15 @@ void generateGrid() {
 cell* selectRand(int x, int y) {
     node selectedNode = graph[grid[x][y].key];
     int freeEdges = 0;
+    node edgeList[4];
+
     for (int i = 0; i<selectedNode.edgeCount; i++) {
         node targetNode = graph[selectedNode.edges[i].destKey];
-        if (grid[targetNode.xPos][targetNode.yPos].visited == 0) { freeEdges++; }
+        if (grid[targetNode.xPos][targetNode.yPos].visited == 0) { edgeList[freeEdges] = targetNode; freeEdges++; }
     };
     if (freeEdges == 0) { return NULL; }
-    printf("Selecting");
-    int selection = (rand() % 4);
-    
-    switch(selection) {
-        case 0:
-            return &grid[x-1][y];
-        case 1:
-            return &grid[x+1][y];
-        case 2:
-            return &grid[x][y-1];
-        case 3:
-            return &grid[x][y+1];
-        default:
-            return &grid[x+1][y];
-    }
+    int selection = (rand() % freeEdges);
+    return &grid[edgeList[selection].xPos][edgeList[selection].yPos];
 };
 
 void flagWalls(int x, int y) {
@@ -158,34 +147,25 @@ void pathGeneration() {
 
     enqueue(&graph[grid[randX][randY].key]);
     grid[randX][randY].visited = 1;
+    grid[randX][randY].type = 'S';
     
     while(nodeQueue.arrSize > 0) {
-        printf("resetting\n");
         cell *selected = NULL;
-        while(1>0) {
-            selected = selectRand(nodeQueue.arr[nodeQueue.head]->xPos, nodeQueue.arr[nodeQueue.head]->yPos);
-            if (selected == NULL) { break; }
-            else if(selected != NULL && !selected->visited) { break; }
-        }
-        printf("passed");
+        selected = selectRand(nodeQueue.arr[nodeQueue.head]->xPos, nodeQueue.arr[nodeQueue.head]->yPos);
         if (selected == NULL) {
             dequeue();
         } else {
             selected->visited = 1;
-            grid[nodeQueue.arr[nodeQueue.head]->xPos][nodeQueue.arr[nodeQueue.head]->yPos].type = ' ';
+            if (grid[nodeQueue.arr[nodeQueue.head]->xPos][nodeQueue.arr[nodeQueue.head]->yPos].type != 'S') {
+                grid[nodeQueue.arr[nodeQueue.head]->xPos][nodeQueue.arr[nodeQueue.head]->yPos].type = ' ';
+            }
 
             flagWalls(nodeQueue.arr[nodeQueue.head]->xPos, nodeQueue.arr[nodeQueue.head]->yPos);
             enqueue(&graph[selected->key]);
         }
-
-        
-        for (int i = 0; i < height; ++i) {
-            for (int j = 0; j < width; ++j) {
-                printf("%c ", grid[i][j].type);
-            }
-            printf("\n");
-        }
     }
+
+    grid[nodeQueue.arr[nodeQueue.head-1]->xPos][nodeQueue.arr[nodeQueue.head-1]->yPos].type = 'E';
 };
 
 int main(int argc, char *argv[]) {
