@@ -36,23 +36,23 @@ typedef struct queue {
     node *arr[1024];
 } queue;
 
-queue nodeQueue;
+queue nodeStack;
 cell **grid;
 node *graph;
 
 void enqueue(node *n) {
-    nodeQueue.arr[nodeQueue.tail] = n;
-    nodeQueue.tail++;
-    nodeQueue.arrSize++;
+    nodeStack.arr[nodeStack.tail] = n;
+    nodeStack.tail++;
+    nodeStack.arrSize++;
 }
 
 void dequeue() {
-    nodeQueue.head++;
-    nodeQueue.arrSize--;
+    nodeStack.head++;
+    nodeStack.arrSize--;
 }
 
 void addNeighbour(int key, int destKey, int weight) {
-    for(int i = 0; i < height*width; i++) {
+    for(int i = 0; i < height*width; ++i) {
         if (graph[i].key == key) {
             edge e;
             e.destKey = destKey;
@@ -65,7 +65,7 @@ void addNeighbour(int key, int destKey, int weight) {
 }
 
 void generateGraph() {
-    for (int i = 0; i < height; i++) {
+    for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; j ++ ) {
             int key = grid[i][j].key;
             int randWeight = (rand() % 5);
@@ -104,7 +104,7 @@ void generateGrid() {
             c.type = '#';
             c.visited = 0;
             
-            for (int i = 0; i<4; i++) {
+            for (int i = 0; i<4; ++i) {
                 c.walls[i] = 1;
             }
             grid[i][j] = c;
@@ -127,7 +127,7 @@ node* selectRand(int x, int y) {
     int freeEdges = 0;
     node edgeList[4];
 
-    for (int i = 0; i<selectedNode.edgeCount; i++) {
+    for (int i = 0; i<selectedNode.edgeCount; ++i) {
         node targetNode = graph[selectedNode.edges[i].destKey];
         if (grid[targetNode.xPos][targetNode.yPos].visited == 0) { edgeList[freeEdges] = targetNode; freeEdges++; }
     };
@@ -158,7 +158,7 @@ void flagWalls(node *targetNode, node *selectedNode) {
     }
 
     // node selectedNode = graph[grid[x][y].key];
-    //  for (int i = 0; i<selectedNode.edgeCount; i++) {
+    //  for (int i = 0; i<selectedNode.edgeCount; ++i) {
     //     node targetNode = graph[selectedNode.edges[i].destKey];
     //     grid[targetNode.xPos][targetNode.yPos].visited = 1;
     // };
@@ -172,23 +172,23 @@ void pathGeneration() {
     grid[randX][randY].visited = 1;
     grid[randX][randY].type = 'S';
     
-    while(nodeQueue.arrSize > 0) {
+    while(nodeStack.arrSize > 0) {
         node *selected = NULL;
-        selected = selectRand(nodeQueue.arr[nodeQueue.head]->xPos, nodeQueue.arr[nodeQueue.head]->yPos);
+        selected = selectRand(nodeStack.arr[nodeStack.head]->xPos, nodeStack.arr[nodeStack.head]->yPos);
         if (selected == NULL) {
             dequeue();
         } else {
             grid[selected->xPos][selected->yPos].visited = 1;
-            if (grid[nodeQueue.arr[nodeQueue.head]->xPos][nodeQueue.arr[nodeQueue.head]->yPos].type != 'S') {
-                flagWalls(nodeQueue.arr[nodeQueue.head], selected);
-                // grid[nodeQueue.arr[nodeQueue.head]->xPos][nodeQueue.arr[nodeQueue.head]->yPos].walls[0 ];
+            if (grid[nodeStack.arr[nodeStack.head]->xPos][nodeStack.arr[nodeStack.head]->yPos].type != 'S') {
+                flagWalls(nodeStack.arr[nodeStack.head], selected);
+                // grid[nodeStack.arr[nodeStack.head]->xPos][nodeStack.arr[nodeStack.head]->yPos].walls[0 ];
             }
 
             enqueue(&graph[selected->key]);
         }
     }
 
-    grid[nodeQueue.arr[nodeQueue.head-1]->xPos][nodeQueue.arr[nodeQueue.head-1]->yPos].type = 'E';
+    grid[nodeStack.arr[nodeStack.head-1]->xPos][nodeStack.arr[nodeStack.head-1]->yPos].type = 'E';
 };
 
 void printCell(int x, int y) {

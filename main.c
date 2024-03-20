@@ -10,6 +10,8 @@ int width;
 int lastX;
 int lastY;
 
+time_t seed;
+
 typedef struct cell {
     int key;
     int xPos;
@@ -20,7 +22,6 @@ typedef struct cell {
 
 typedef struct edge {
     int destKey;
-    int weight;
 } edge;
 
 typedef struct node {
@@ -37,22 +38,22 @@ typedef struct queue {
     node *arr[1024];
 } queue;
 
-queue nodeQueue;
+queue nodeStack;
 cell **grid;
 node *graph;
 
 void push(node *n) {
-    nodeQueue.pointer++;
-    nodeQueue.arr[nodeQueue.pointer] = n;
-    nodeQueue.arrSize++;
+    nodeStack.pointer++;
+    nodeStack.arr[nodeStack.pointer] = n;
+    nodeStack.arrSize++;
 }
 
 void pop() {
-    nodeQueue.pointer--;
+    nodeStack.pointer--;
 }
 
 void addNeighbour(int key, int destKey) {
-    for(int i = 0; i < height*width; i++) {
+    for(int i = 0; i < height*width; ++i) {
         if (graph[i].key == key) {
             edge e;
             e.destKey = destKey;
@@ -64,7 +65,7 @@ void addNeighbour(int key, int destKey) {
 }
 
 void generateGraph() {
-    for (int i = 0; i < height; i++) {
+    for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; j ++ ) {
             int key = grid[i][j].key;
             if (i - 2 >= 0) {
@@ -123,7 +124,7 @@ cell* selectRand(int x, int y) {
     int freeEdges = 0;
     node edgeList[4];
 
-    for (int i = 0; i<selectedNode.edgeCount; i++) {
+    for (int i = 0; i<selectedNode.edgeCount; ++i) {
         node targetNode = graph[selectedNode.edges[i].destKey];
         if (grid[targetNode.xPos][targetNode.yPos].visited == 0) { edgeList[freeEdges] = targetNode; freeEdges++; }
     };
@@ -170,18 +171,18 @@ void pathGeneration() {
     grid[randX][randY].visited = 1;
     grid[randX][randY].type = 'S';
     
-    while(nodeQueue.pointer > 0) {
+    while(nodeStack.pointer > 0) {
         cell *selected = NULL;
-        selected = selectRand(nodeQueue.arr[nodeQueue.pointer]->xPos, nodeQueue.arr[nodeQueue.pointer]->yPos);
+        selected = selectRand(nodeStack.arr[nodeStack.pointer]->xPos, nodeStack.arr[nodeStack.pointer]->yPos);
 
         if (selected == NULL) {
-            if (grid[nodeQueue.arr[nodeQueue.pointer]->xPos][nodeQueue.arr[nodeQueue.pointer]->yPos].type != 'S') {
-                grid[nodeQueue.arr[nodeQueue.pointer]->xPos][nodeQueue.arr[nodeQueue.pointer]->yPos].type = ' ';
+            if (grid[nodeStack.arr[nodeStack.pointer]->xPos][nodeStack.arr[nodeStack.pointer]->yPos].type != 'S') {
+                grid[nodeStack.arr[nodeStack.pointer]->xPos][nodeStack.arr[nodeStack.pointer]->yPos].type = ' ';
             }
             pop();
         } else {
             selected->visited = 1;
-            removeWall(nodeQueue.arr[nodeQueue.pointer], &graph[selected->key]);
+            removeWall(nodeStack.arr[nodeStack.pointer], &graph[selected->key]);
             push(&graph[selected->key]);
         }
     }
@@ -193,9 +194,11 @@ int main(int argc, char *argv[]) {
     height = atoi(argv[1]);
     width = atoi(argv[2]);
     if(argc == 4) {
-        srand(atoi(argv[3]));
+        seed = atoi(argv[3]);
+        srand(seed);
     } else {
-        srand(time(NULL));
+        seed = time(NULL);
+        srand(seed);
     }
 
     graph = malloc(height*width*sizeof(node));
@@ -210,6 +213,31 @@ int main(int argc, char *argv[]) {
         }
         printf("\n");
     }
+    printf("Generated using seed: %li\n", seed);
 
+    char mazeFP[1024];
+
+    sprintf(mazeFP, "maze_%li.txt", seed);
+
+
+    FILE *fp = fopen(mazeFP, "w");
+
+    if(fp == NULL) { printf("ERROR OPENING FILE\n%s\n", mazeFP); }
+
+    for(int i = 0; i<height; ++i) {
+        char line[width];
+        for (int j = 0; j < width; ++j) {
+            line[j]=grid[i][j].type;
+        }
+        line[width] = '\0';
+        fprintf(fp, "%s\n", line);
+    }
+
+    fclose(fp);
+
+    for (int i = 0; i < height; ++i) {
+        free(grid[i]);
+    }
     free(grid);
+    free(graph);
 }
