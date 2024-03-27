@@ -170,14 +170,13 @@ void pathGeneration() {
     grid[randX][randY].type = 'S';
     
     while(nodeStack.pointer > 0) {
-        cell currentCell = grid[nodeStack.arr[nodeStack.pointer]->xPos][nodeStack.arr[nodeStack.pointer]->yPos];
+        cell *currentCell = &grid[nodeStack.arr[nodeStack.pointer]->xPos][nodeStack.arr[nodeStack.pointer]->yPos];
         cell *selected = NULL;
-        
-        selected = selectRand(currentCell.xPos, currentCell.yPos);
+        selected = selectRand(currentCell->xPos, currentCell->yPos);
 
         if (selected == NULL) {
-            if (currentCell.type != 'S') {
-                currentCell.type = ' ';
+            if (currentCell->type != 'S') {
+                currentCell->type = ' ';
             }
             pop();
         } else {
@@ -218,6 +217,7 @@ int main(int argc, char *argv[]) {
     char mazeFP[1024];
 
     sprintf(mazeFP, "maze_%li.txt", seed);
+
 
     FILE *fp = fopen(mazeFP, "w");
 
