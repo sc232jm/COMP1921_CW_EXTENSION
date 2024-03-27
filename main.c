@@ -33,7 +33,6 @@ typedef struct node {
 } node;
 
 typedef struct queue {
-    int arrSize;
     int pointer;
     node *arr[1024];
 } queue;
@@ -45,7 +44,6 @@ node *graph;
 void push(node *n) {
     nodeStack.pointer++;
     nodeStack.arr[nodeStack.pointer] = n;
-    nodeStack.arrSize++;
 }
 
 void pop() {
@@ -172,12 +170,14 @@ void pathGeneration() {
     grid[randX][randY].type = 'S';
     
     while(nodeStack.pointer > 0) {
+        cell currentCell = grid[nodeStack.arr[nodeStack.pointer]->xPos][nodeStack.arr[nodeStack.pointer]->yPos];
         cell *selected = NULL;
-        selected = selectRand(nodeStack.arr[nodeStack.pointer]->xPos, nodeStack.arr[nodeStack.pointer]->yPos);
+        
+        selected = selectRand(currentCell.xPos, currentCell.yPos);
 
         if (selected == NULL) {
-            if (grid[nodeStack.arr[nodeStack.pointer]->xPos][nodeStack.arr[nodeStack.pointer]->yPos].type != 'S') {
-                grid[nodeStack.arr[nodeStack.pointer]->xPos][nodeStack.arr[nodeStack.pointer]->yPos].type = ' ';
+            if (currentCell.type != 'S') {
+                currentCell.type = ' ';
             }
             pop();
         } else {
@@ -218,7 +218,6 @@ int main(int argc, char *argv[]) {
     char mazeFP[1024];
 
     sprintf(mazeFP, "maze_%li.txt", seed);
-
 
     FILE *fp = fopen(mazeFP, "w");
 
