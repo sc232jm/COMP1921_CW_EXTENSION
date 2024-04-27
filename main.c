@@ -75,8 +75,10 @@ void addNeighbour(int key, int destKey)
     // Iterate through the height and the width
     for (int i = 0; i < height * width; i++)
     {
+        // Find the matching node
         if (graph[i].key == key)
         {
+            // Add the edge and increment the edgeCount
             edge e;
             e.destKey = destKey;
 
