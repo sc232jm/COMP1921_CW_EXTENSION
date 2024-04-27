@@ -45,7 +45,7 @@ typedef struct node
 typedef struct queue
 {
     int pointer;
-    node *arr[1024];
+    node *arr[2048];
 } queue;
 
 // Instance the structs
