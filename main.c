@@ -45,7 +45,7 @@ typedef struct node
 typedef struct queue
 {
     int pointer;
-    node *arr[2048];
+    node *arr[204800];
 } queue;
 
 // Instance the structs
@@ -200,9 +200,7 @@ void removeWall(node *rootNode, node *selectedNode)
     cell *targetCell;
 
     // Find the targetCell corresponding to the X and Y differences
-    switch (deltaX < 0 ? 0 : deltaY < 0 ? 2
-                         : deltaX > 0   ? 1
-                                        : 3)
+    switch (deltaX < 0 ? 0 : deltaY < 0 ? 2 : deltaX > 0 ? 1 : 3)
     {
     case 0:
         targetCell = &grid[rootNode->xPos - 1][rootNode->yPos];
