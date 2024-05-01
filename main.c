@@ -285,6 +285,8 @@ int main(int argc, char *argv[])
     height = atoi(argv[1]);
     width = atoi(argv[2]);
 
+    if (height > 100 || height < 5 || width > 100 || width < 5) { printf("Generation must be within the predefined bounds.\n"); return 1; }
+
     // If a fourth argument is specified use this as the seed
     if (argc == 4)
     {
