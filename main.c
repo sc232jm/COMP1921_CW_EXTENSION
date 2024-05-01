@@ -12,6 +12,7 @@ int width;
 int lastX;
 int lastY;
 
+
 // Define the the seed variable
 time_t seed;
 
@@ -45,7 +46,7 @@ typedef struct node
 typedef struct queue
 {
     int pointer;
-    node *arr[__INT16_MAX__*8192];
+    node *arr[2048];
 } queue;
 
 // Instance the structs
